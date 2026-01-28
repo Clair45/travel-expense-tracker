@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>旅行记账AA - 智能分账助手</title>
+    
+    <!-- 自定义 CSS -->
+    <link href="travel-expense-tracker.css?v=1.2" rel="stylesheet">
+    
+    <!-- 图标库 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Socket.IO 客户端 -->
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <!-- 头部 -->
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-plane-departure"></i> 旅行记账AA</h1>
+            <p>智能分账助手，让旅行账单更清晰</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- 旅行列表卡片 -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-suitcase"></i> 我的旅行</h2>
+                <button class="btn btn-primary" onclick="createNewTravel()">
+                    <i class="fas fa-plus"></i> 新建旅行
+                </button>
+            </div>
+            <div id="travelList"></div>
+        </div>
+
+        <!-- 空状态提示 -->
+        <div id="emptyState" style="display: none;">
+            <div class="card">
+                <div class="empty-state">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <h3>还没有旅行计划</h3>
+                    <p>点击上方按钮创建你的第一个旅行计划</p>
+                    <button class="btn btn-primary btn-lg" onclick="createNewTravel()" style="margin-top: 20px;">
+                        <i class="fas fa-plus"></i> 创建新旅行
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载应用逻辑 -->
+    <script src="cloud-api.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

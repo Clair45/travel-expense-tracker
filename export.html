@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>导出 - 旅行记账AA</title>
+    
+    <!-- 自定义 CSS -->
+    <link href="travel-expense-tracker.css?v=1.2" rel="stylesheet">
+    
+    <!-- 图标库 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Socket.IO 客户端 -->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <!-- PDF 生成库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        /* 导出选项样式 */
+        .export-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .export-option {
+            padding: 25px;
+            background: linear-gradient(135deg, #f0fdfa 0%, #d1fae5 100%);
+            border: 2px solid #ccfbf1;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .export-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(13, 148, 136, 0.15);
+            border-color: #0d9488;
+        }
+
+        .export-icon {
+            font-size: 3rem;
+            color: #0d9488;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .export-option h4 {
+            color: #0d9488;
+            font-size: 1.2rem;
+            margin: 15px 0 10px 0;
+        }
+
+        .export-option p {
+            color: #6b7280;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部导航 -->
+    <header class="page-header">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="header-content">
+                <button class="back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i> 返回
+                </button>
+                <h1>
+                    <i class="fas fa-file-export"></i> 导出
+                </h1>
+            </div>
+        </div>
+        <div class="container" style="text-align: center; padding-top: 0;">
+            <p id="travelInfoDisplay" style="opacity: 0.9;"></p>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- 导出选项 -->
+        <div class="card">
+            <h2><i class="fas fa-download"></i> 选择导出格式</h2>
+            <div class="export-options">
+                <div class="export-option" onclick="exportPDF()">
+                    <i class="fas fa-file-pdf export-icon"></i>
+                    <h4>导出 PDF</h4>
+                    <p>生成专业的结算报告，适合打印和归档</p>
+                    <span style="display: inline-block; padding: 4px 12px; background: #dbeafe; color: #1e40af; border-radius: 12px; font-size: 0.85rem; margin-top: 10px;">推荐</span>
+                </div>
+                <div class="export-option" onclick="exportImage()">
+                    <i class="fas fa-image export-icon"></i>
+                    <h4>导出图片</h4>
+                    <p>生成高清图片，便于分享到群聊</p>
+                    <span style="display: inline-block; padding: 4px 12px; background: #d1fae5; color: #065f46; border-radius: 12px; font-size: 0.85rem; margin-top: 10px;">快速</span>
+                </div>
+                <div class="export-option" onclick="openShareModal()">
+                    <i class="fas fa-link export-icon"></i>
+                    <h4>分享链接</h4>
+                    <p>生成分享链接，邀请成员查看</p>
+                    <span style="display: inline-block; padding: 4px 12px; background: #fef3c7; color: #92400e; border-radius: 12px; font-size: 0.85rem; margin-top: 10px;">便捷</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 预览区域 -->
+        <div class="card" id="previewCard" style="display: none;">
+            <h2><i class="fas fa-eye"></i> 预览</h2>
+            <div id="previewContent" class="preview-content"></div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-primary" onclick="exportPDF()">
+                    <i class="fas fa-download"></i> 下载 PDF
+                </button>
+                <button class="btn btn-success" onclick="exportImage()">
+                    <i class="fas fa-download"></i> 下载图片
+                </button>
+            </div>
+        </div>
+
+        <!-- 快捷操作 -->
+        <div class="card">
+            <h2><i class="fas fa-bolt"></i> 快捷操作</h2>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="btn btn-primary btn-lg" onclick="window.location.href='settlement.html'">
+                    <i class="fas fa-calculator"></i> 查看结算详情
+                </button>
+                <button class="btn btn-secondary btn-lg" onclick="window.location.href='expenses.html'">
+                    <i class="fas fa-receipt"></i> 管理账单
+                </button>
+                <button class="btn btn-secondary btn-lg" onclick="window.location.href='index.html'">
+                    <i class="fas fa-home"></i> 返回首页
+                </button>
+            </div>
+        </div>
+
+        <!-- 使用提示 -->
+        <div class="card">
+            <h2><i class="fas fa-lightbulb"></i> 使用提示</h2>
+            <div style="padding: 15px; background: #dbeafe; border-radius: 8px; margin-bottom: 10px;">
+                <i class="fas fa-info-circle" style="color: #1e40af;"></i>
+                PDF 格式适合打印和长期保存
+            </div>
+            <div style="padding: 15px; background: #d1fae5; border-radius: 8px; margin-bottom: 10px;">
+                <i class="fas fa-info-circle" style="color: #065f46;"></i>
+                图片格式适合在微信等社交平台分享
+            </div>
+            <div style="padding: 15px; background: #fef3c7; border-radius: 8px;">
+                <i class="fas fa-exclamation-triangle" style="color: #92400e;"></i>
+                分享链接需要团队成员访问才能查看
+            </div>
+        </div>
+    </div>
+
+    <!-- 分享模态框 -->
+    <div class="modal" id="shareModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-share-alt"></i> 分享旅行</h3>
+                <button class="modal-close" onclick="closeShareModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>分享链接</label>
+                    <input type="text" id="shareLink" class="form-control" readonly>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeShareModal()">关闭</button>
+            </div>
+            <div style="padding: 0 25px 25px;">
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <button class="btn btn-success" onclick="shareToWeChat()">
+                        <i class="fab fa-weixin"></i> 微信分享
+                    </button>
+                    <button class="btn btn-primary" onclick="shareToEmail()">
+                        <i class="fas fa-envelope"></i> 邮件分享
+                    </button>
+                    <button class="btn btn-primary" onclick="copyLink()">
+                        <i class="fas fa-copy"></i> 复制链接
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载页面逻辑 -->
+    <script src="cloud-api.js"></script>
+    <script src="export.js"></script>
+</body>
+</html>

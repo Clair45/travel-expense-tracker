@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>结算 - 旅行记账AA</title>
+    
+    <!-- 自定义 CSS -->
+    <link href="travel-expense-tracker.css?v=1.2" rel="stylesheet">
+    
+    <!-- 图标库 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Socket.IO 客户端 -->
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <!-- 头部导航 -->
+    <header class="page-header">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="header-content">
+                <button class="back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i> 返回
+                </button>
+                <h1>
+                    <i class="fas fa-calculator"></i> 结算
+                </h1>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="refreshSettlement()">
+                    <i class="fas fa-sync-alt"></i> 刷新
+                </button>
+            </div>
+        </div>
+        <div class="container" style="text-align: center; padding-top: 0;">
+            <p id="travelInfoDisplay" style="opacity: 0.9;"></p>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- 总览卡片 -->
+        <div class="card">
+            <h2><i class="fas fa-chart-bar"></i> 消费总览</h2>
+            <div class="row">
+                <div class="col">
+                    <div class="quick-stat">
+                        <div class="stat-label">总消费</div>
+                        <div class="stat-value" id="totalAmount">¥0.00</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="quick-stat">
+                        <div class="stat-label">账单数</div>
+                        <div class="stat-value" id="totalExpenses">0</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="quick-stat">
+                        <div class="stat-label">人均消费</div>
+                        <div class="stat-value" id="perPersonAmount">¥0.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 成员统计表格 -->
+        <div class="card">
+            <h2><i class="fas fa-users"></i> 成员消费统计</h2>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: var(--bg-color);">
+                            <th style="padding: 12px; text-align: left; border-bottom: 2px solid var(--border-color);">成员</th>
+                            <th style="padding: 12px; text-align: right; border-bottom: 2px solid var(--border-color);">实际支付</th>
+                            <th style="padding: 12px; text-align: right; border-bottom: 2px solid var(--border-color);">应付金额</th>
+                            <th style="padding: 12px; text-align: right; border-bottom: 2px solid var(--border-color);">余额</th>
+                        </tr>
+                    </thead>
+                    <tbody id="memberStatsBody">
+                        <tr>
+                            <td colspan="4" style="padding: 20px; text-align: center; color: #999;">
+                                暂无数据
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 分类统计 -->
+        <div class="card">
+            <h2><i class="fas fa-tags"></i> 分类统计</h2>
+            <div class="row">
+                <div class="col">
+                    <div class="quick-stat">
+                        <div class="stat-label">交通</div>
+                        <div class="stat-value" id="stat交通">¥0.00</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="quick-stat">
+                        <div class="stat-label">住宿</div>
+                        <div class="stat-value" id="stat住宿">¥0.00</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="quick-stat">
+                        <div class="stat-label">餐饮</div>
+                        <div class="stat-value" id="stat餐饮">¥0.00</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="quick-stat">
+                        <div class="stat-label">购物</div>
+                        <div class="stat-value" id="stat购物">¥0.00</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="quick-stat">
+                        <div class="stat-label">其他</div>
+                        <div class="stat-value" id="stat其他">¥0.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分类详情 -->
+        <div class="card">
+            <h2><i class="fas fa-chart-pie"></i> 分类明细</h2>
+            <div id="categoryDetails" style="display: flex; flex-direction: column; gap: 15px;">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+
+        <!-- 债务网络 -->
+        <div class="card">
+            <h2><i class="fas fa-network-wired"></i> 债务结算</h2>
+            <div id="debtNetwork" class="debt-network">
+                <div class="empty-state">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>暂无债务</h3>
+                    <p>所有成员都已结清</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 操作按钮 - 修改这一部分 -->
+        <div class="card">
+            <h2><i class="fas fa-cog"></i> 操作</h2>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- 导出选项 -->
+                <div class="export-options">
+                    <div class="export-option" onclick="exportPDF()">
+                        <i class="fas fa-file-pdf export-icon"></i>
+                        <h4>导出 PDF</h4>
+                        <p>生成专业的结算报告</p>
+                    </div>
+                    <div class="export-option" onclick="exportImage()">
+                        <i class="fas fa-image export-icon"></i>
+                        <h4>导出图片</h4>
+                        <p>生成图片便于分享</p>
+                    </div>
+                    <div class="export-option" onclick="openShareModal()">
+                        <i class="fas fa-link export-icon"></i>
+                        <h4>分享链接</h4>
+                        <p>生成邀请链接</p>
+                    </div>
+                </div>
+                
+                <!-- 预览区域 -->
+                <div id="previewCard" style="display: none; margin-top: 20px;">
+                    <h3><i class="fas fa-eye"></i> 预览</h3>
+                    <div id="previewContent" class="preview-content" style="margin-top: 15px;"></div>
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button class="btn btn-primary" onclick="exportPDF()">
+                            <i class="fas fa-download"></i> 下载 PDF
+                        </button>
+                        <button class="btn btn-success" onclick="exportImage()">
+                            <i class="fas fa-download"></i> 下载图片
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 其他快捷操作 -->
+                <button class="btn btn-secondary btn-lg" onclick="goToPage('expenses.html')">
+                    <i class="fas fa-receipt"></i> 管理账单
+                </button>
+                <button class="btn btn-secondary btn-lg" onclick="goToPage('index.html')">
+                    <i class="fas fa-home"></i> 返回首页
+                </button>
+            </div>
+        </div>
+
+        <!-- 分享模态框 -->
+        <div class="modal" id="shareModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-share-alt"></i> 分享旅行</h3>
+                    <button class="modal-close" onclick="closeShareModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>分享链接</label>
+                        <input type="text" id="shareLink" class="form-control" readonly>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeShareModal()">关闭</button>
+                </div>
+                <div style="padding: 0 25px 25px;">
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button class="btn btn-success" onclick="copyLink()">
+                            <i class="fas fa-copy"></i> 复制链接
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载页面逻辑 -->
+    <script src="cloud-api.js"></script>
+    <script src="settlement.js"></script>
+
+    <!-- PDF 生成库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</body>
+</html>

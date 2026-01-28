@@ -1,0 +1,1151 @@
+/* ==================== 变量定义 ==================== */
+:root {
+    /* 主色调 - 蓝绿色系 */
+    --primary-color: #0d9488;
+    --primary-light: #14b8a6;
+    --primary-dark: #0f766e;
+    --secondary-color: #5eead4;
+    
+    /* 背景颜色 */
+    --bg-color: #f0fdfa;
+    --bg-gradient: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+    --card-bg: #ffffff;
+    
+    /* 文字颜色 */
+    --text-primary: #134e4a;
+    --text-secondary: #6b7280;
+    
+    /* 边框颜色 */
+    --border-color: #ccfbf1;
+    
+    /* 功能色 */
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    
+    /* 阴影 */
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* ==================== 基础样式 ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    background: var(--bg-gradient);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* ==================== 头部样式 ==================== */
+header {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+    color: white;
+    padding: 40px 0;
+    text-align: center;
+    border-radius: 0 0 20px 20px;
+    box-shadow: var(--shadow-lg);
+    margin-bottom: 30px;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+header h1 i {
+    margin-right: 10px;
+}
+
+header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 0;
+}
+
+.page-header .header-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.page-header .back-btn {
+    color: white;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.page-header .back-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.page-header .header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* ==================== 导航样式 ==================== */
+.nav-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.nav-tab {
+    padding: 12px 30px;
+    border: none;
+    background: var(--card-bg);
+    color: var(--text-secondary);
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+}
+
+.nav-tab:hover {
+    background: var(--primary-light);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.nav-tab.active {
+    background: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 15px rgba(13, 148, 136, 0.4);
+}
+
+/* ==================== 卡片样式 ==================== */
+.card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: var(--shadow-lg);
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+}
+
+.card h2 {
+    color: var(--primary-dark);
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card h2 i {
+    color: var(--primary-color);
+}
+
+/* ==================== 旅行列表样式 ==================== */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.card-header h2 {
+    margin: 0;
+}
+
+.travel-item {
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: white;
+}
+
+.travel-item:hover {
+    border-color: var(--primary-light);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.travel-item.active {
+    border-color: var(--primary-color);
+    background: var(--bg-color);
+}
+
+.travel-main {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.travel-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.travel-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.travel-name {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.travel-date {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.travel-date i {
+    margin-right: 5px;
+}
+
+.travel-members {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.travel-members i {
+    margin-right: 5px;
+}
+
+.travel-stats {
+    display: flex;
+    gap: 20px;
+    text-align: center;
+}
+
+.stat-item {
+    min-width: 80px;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.travel-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* ==================== 导航卡片 ==================== */
+.nav-card .row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.nav-item {
+    background: var(--bg-color);
+    border-radius: 12px;
+    padding: 30px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.nav-item:hover {
+    background: white;
+    border-color: var(--primary-light);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-3px);
+}
+
+.nav-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2rem;
+    margin: 0 auto 15px;
+}
+
+.nav-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.nav-desc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* ==================== 快速统计 ==================== */
+.quick-stat {
+    background: var(--bg-color);
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.quick-stat:hover {
+    border-color: var(--primary-light);
+    background: white;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* ==================== 表单样式 ==================== */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: var(--bg-color);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+
+/* ==================== 按钮样式 ==================== */
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(13, 148, 136, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(13, 148, 136, 0.4);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.btn-secondary {
+    background: #e5e7eb;
+    color: var(--text-primary);
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-lg {
+    padding: 15px 30px;
+    font-size: 1.1rem;
+}
+
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 0.875rem;
+}
+
+/* ==================== 布局样式 ==================== */
+.row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.col {
+    flex: 1;
+    min-width: 250px;
+}
+
+/* ==================== 成员标签样式 ==================== */
+.members-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    min-height: 60px;
+    padding: 15px;
+    background: var(--bg-color);
+    border-radius: 8px;
+    border: 2px dashed var(--border-color);
+}
+
+.member-tag {
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--secondary-color) 100%);
+    color: var(--primary-dark);
+    padding: 8px 16px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.member-tag:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.member-tag .remove-btn {
+    background: rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: var(--primary-dark);
+    transition: all 0.3s ease;
+}
+
+.member-tag .remove-btn:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* ==================== 账单列表样式 ==================== */
+.expense-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    min-height: 200px;
+}
+
+.expense-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #f9fafb;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.expense-item:hover {
+    background: #f0fdfa;
+    border-color: #0d9488;
+    box-shadow: 0 2px 8px rgba(13, 148, 136, 0.1);
+}
+
+.expense-left {
+    display: flex;
+    gap: 12px;
+    flex: 1;
+}
+
+.expense-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #f0fdfa 0%, #d1fae5 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0d9488;
+    font-size: 1.2rem;
+}
+
+.expense-info {
+    flex: 1;
+}
+
+.expense-description {
+    font-weight: 600;
+    color: #111;
+    margin-bottom: 4px;
+}
+
+.expense-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.expense-category,
+.expense-payer {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.expense-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.expense-amount {
+    font-weight: 700;
+    color: #0d9488;
+    font-size: 1.1rem;
+    min-width: 90px;
+    text-align: right;
+}
+
+/* ==================== 分类项目样式 ==================== */
+.category-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    background: linear-gradient(135deg, #f0fdfa 0%, #f0fdf4 100%);
+    border-radius: 10px;
+    border: 2px solid #ccfbf1;
+    transition: all 0.3s ease;
+}
+
+.category-item:hover {
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.1);
+    border-color: #0d9488;
+}
+
+.category-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    text-align: center;
+    color: #0d9488;
+}
+
+.category-info {
+    flex: 1;
+}
+
+.category-name {
+    font-weight: 600;
+    color: #111;
+    margin-bottom: 4px;
+}
+
+.category-amount {
+    color: #0d9488;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+/* ==================== 分类详情样式 ==================== */
+.category-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 8px;
+    border-left: 4px solid #0d9488;
+}
+
+.category-detail-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    text-align: center;
+}
+
+.category-detail-info {
+    flex: 1;
+}
+
+.category-detail-name {
+    font-weight: 600;
+    color: #111;
+    margin-bottom: 8px;
+}
+
+.category-detail-bar {
+    width: 100%;
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.category-detail-progress {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.category-detail-amount {
+    text-align: right;
+}
+
+.category-detail-value {
+    font-weight: 700;
+    color: #0d9488;
+    font-size: 1.1rem;
+}
+
+.category-detail-percent {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+/* ==================== 债务项目样式 ==================== */
+.debt-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    background: linear-gradient(135deg, #fef3c7 0%, #fef9e7 100%);
+    border-radius: 10px;
+    border: 2px solid #fcd34d;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.debt-item:hover {
+    box-shadow: 0 4px 12px rgba(146, 64, 14, 0.1);
+    border-color: #f59e0b;
+}
+
+.debt-from {
+    font-weight: 700;
+    color: #92400e;
+    min-width: 100px;
+    text-align: left;
+}
+
+.debt-arrow {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex: 1;
+    margin: 0 20px;
+}
+
+.debt-arrow i {
+    color: #92400e;
+    font-size: 1.2rem;
+}
+
+.debt-amount {
+    color: #0d9488;
+    font-weight: 700;
+    font-size: 1.2rem;
+    background: rgba(13, 148, 136, 0.1);
+    padding: 5px 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.debt-to {
+    font-weight: 700;
+    color: #065f46;
+    min-width: 100px;
+    text-align: right;
+}
+
+/* ==================== 导出选项样式 ==================== */
+.export-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.export-option {
+    background: var(--bg-color);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+}
+
+.export-option:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+.export-icon {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.export-option h4 {
+    color: var(--text-primary);
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+}
+
+.export-option p {
+    color: var(--text-secondary);
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* ==================== 预览样式 ==================== */
+.preview-container {
+    margin-top: 30px;
+}
+
+.preview-container h3 {
+    color: var(--primary-dark);
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+}
+
+.preview-content {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+}
+
+/* ==================== 模态框样式 ==================== */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideIn 0.3s ease;
+}
+
+.modal-header {
+    padding: 20px 25px;
+    border-bottom: 2px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    color: var(--primary-dark);
+    font-size: 1.3rem;
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    background: #fee2e2;
+    color: var(--danger-color);
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+.modal-footer {
+    padding: 20px 25px;
+    border-top: 2px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* ==================== 首页导航卡片样式 ==================== */
+.nav-card {
+    margin-bottom: 20px;
+}
+
+.nav-item {
+    background: var(--bg-color);
+    padding: 30px 20px;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+    border: 2px solid var(--border-color);
+}
+
+.nav-item:hover {
+    border-color: var(--primary-color);
+    background: var(--secondary-color);
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.nav-icon {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.nav-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+    margin-bottom: 5px;
+}
+
+.nav-desc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* ==================== 快速统计卡片样式 ==================== */
+.quick-stat {
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--secondary-color) 100%);
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.quick-stat .stat-label {
+    color: var(--primary-dark);
+    font-weight: 500;
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.quick-stat .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+}
+
+/* ==================== 空状态样式 ==================== */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: var(--border-color);
+}
+
+.empty-state h3 {
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+/* ==================== 动画效果 ==================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease;
+}
+
+.animate-slide-in {
+    animation: slideIn 0.3s ease;
+}
+
+/* ==================== 债务和净额样式 ==================== */
+.net-amount {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.net-amount.positive {
+    color: var(--success-color);
+}
+
+.net-amount.negative {
+    color: var(--danger-color);
+}
+
+.net-amount small {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: normal;
+    margin-top: 2px;
+}
+
+.debt-network {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.debt-item {
+    background: var(--bg-color);
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.debt-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.debt-from, .debt-to {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+.debt-from {
+    color: var(--danger-color);
+}
+
+.debt-to {
+    color: var(--success-color);
+    text-align: right;
+    justify-content: flex-end;
+}
+
+.debt-arrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 20px;
+    color: var(--text-secondary);
+}
+
+.debt-amount {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--primary-dark);
+    background: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+}
+
+/* ==================== 复选框标签样式 ==================== */
+.checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--bg-color);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    user-select: none;
+}
+
+.checkbox-label:hover {
+    border-color: var(--primary-light);
+    background: white;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+}
+
+.checkbox-label span {
+    font-weight: 500;
+}
+
+/* ==================== 账单项目扩展样式 ==================== */
+.expense-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.expense-splits {
+    margin-top: 10px;
+    padding: 10px;
+    background: #f0f9ff;
+    border-radius: 6px;
+    border-left: 3px solid #0d9488;
+}
+
+.splits-header {
+    font-size: 0.85rem;
+    color: #0d9488;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.splits-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.split-member {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #ccfbf1;
+    font-size: 0.85rem;
+    color: #0d9488;
+}
+
+.split-member i {
+    font-size: 0.8rem;
+    color: #10b981;
+}
+
+.split-amount {
+    font-weight: 600;
+    color: #065f46;
+}
+
+.expense-currency {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 6px;
+    background: #fef3c7;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: #92400e;
+}

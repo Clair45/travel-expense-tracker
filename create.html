@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创建旅行 - 旅行记账AA</title>
+    
+    <!-- 自定义 CSS -->
+    <link href="travel-expense-tracker.css?v=1.2" rel="stylesheet">
+    
+    <!-- 图标库 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Socket.IO 客户端 -->
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <!-- 头部导航 -->
+    <header class="page-header">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="header-content">
+                <button class="back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i> 返回
+                </button>
+                <h1>
+                    <i class="fas fa-plus-circle"></i>
+                    <span id="pageTitle">创建旅行</span>
+                </h1>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <div class="form-group">
+                <label>旅行名称</label>
+                <input type="text" id="travelName" class="form-control" placeholder="例如：云南七日游">
+            </div>
+            
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label>开始日期</label>
+                        <input type="date" id="startDate" class="form-control">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>结束日期</label>
+                        <input type="date" id="endDate" class="form-control">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>添加成员（输入手机号/邮箱）</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="memberInput" class="form-control" placeholder="输入手机号或邮箱">
+                    <button class="btn btn-primary" onclick="addMember()">
+                        <i class="fas fa-plus"></i> 添加
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>成员列表</label>
+                <div id="membersList" class="members-list">
+                    <div class="empty-state">
+                        <i class="fas fa-users"></i>
+                        <p>暂无成员</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 30px;">
+                <button class="btn btn-primary btn-lg" onclick="saveTravel()">
+                    <i class="fas fa-save"></i> 保存旅行
+                </button>
+                <button class="btn btn-secondary btn-lg" onclick="goBack()">
+                    <i class="fas fa-times"></i> 取消
+                </button>
+            </div>
+        </div>
+
+        <!-- 使用提示 -->
+        <div class="card">
+            <h2><i class="fas fa-lightbulb"></i> 使用提示</h2>
+            <div style="padding: 15px; background: #fef3c7; border-radius: 8px; margin-bottom: 10px;">
+                <i class="fas fa-info-circle" style="color: #92400e;"></i>
+                支持通过手机号或邮箱添加成员
+            </div>
+            <div style="padding: 15px; background: #dbeafe; border-radius: 8px; margin-bottom: 10px;">
+                <i class="fas fa-info-circle" style="color: #1e40af;"></i>
+                成员添加后可在记账页面使用
+            </div>
+            <div style="padding: 15px; background: #fee2e2; border-radius: 8px;">
+                <i class="fas fa-exclamation-triangle" style="color: #991b1b;"></i>
+                删除成员后，该成员相关的账单将不再计入统计
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载页面逻辑 -->
+    <script src="cloud-api.js"></script>
+    <script src="create.js"></script>
+</body>
+</html>

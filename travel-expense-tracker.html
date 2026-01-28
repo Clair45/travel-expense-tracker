@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>旅行记账AA - 智能分账助手</title>
+    
+    <!-- TDesign CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tdesign@1.9.0/dist/tdesign.min.css" rel="stylesheet">
+    
+    <!-- 自定义 CSS -->
+    <link href="travel-expense-tracker.css" rel="stylesheet">
+    
+    <!-- 图标库 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- PDF 生成库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <!-- 头部 -->
+    <header class="t-header">
+        <div class="container">
+            <h1><i class="fas fa-plane-departure"></i> 旅行记账AA</h1>
+            <p>智能分账助手，让旅行账单更清晰</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- 导航标签 -->
+        <t-tabs id="mainTabs" theme="card" value="travel">
+            <t-tab-panel value="travel" label="创建旅行">
+                <t-card title="创建新旅行" class="travel-card">
+                    <t-form id="travelForm" label-width="120px">
+                        <t-form-item label="旅行名称">
+                            <t-input 
+                                id="travelName" 
+                                placeholder="例如：云南七日游" 
+                                clearable
+                            />
+                        </t-form-item>
+                        
+                        <t-row :gutter="20">
+                            <t-col :span="6">
+                                <t-form-item label="开始日期">
+                                    <t-date-picker 
+                                        id="startDate" 
+                                        theme="primary"
+                                        placeholder="选择开始日期"
+                                    />
+                                </t-form-item>
+                            </t-col>
+                            <t-col :span="6">
+                                <t-form-item label="结束日期">
+                                    <t-date-picker 
+                                        id="endDate" 
+                                        theme="primary"
+                                        placeholder="选择结束日期"
+                                    />
+                                </t-form-item>
+                            </t-col>
+                        </t-row>
+                        
+                        <t-form-item label="添加成员">
+                            <t-input-group>
+                                <t-input 
+                                    id="memberInput" 
+                                    placeholder="输入手机号或邮箱"
+                                    clearable
+                                />
+                                <t-button theme="primary" onclick="addMember()">
+                                    <template #icon><i class="fas fa-plus"></i></template>
+                                    添加
+                                </t-button>
+                            </t-input-group>
+                        </t-form-item>
+                        
+                        <t-form-item label="成员列表">
+                            <div id="membersList" class="members-list">
+                                <t-empty description="暂无成员" />
+                            </div>
+                        </t-form-item>
+                        
+                        <t-form-item>
+                            <t-button theme="success" size="large" onclick="createTravel()" block>
+                                <template #icon><i class="fas fa-check"></i></template>
+                                创建旅行
+                            </t-button>
+                        </t-form-item>
+                    </t-form>
+                </t-card>
+
+                <!-- 当前旅行信息 -->
+                <t-card id="currentTravelCard" title="当前旅行" style="display: none;">
+                    <div id="currentTravelInfo"></div>
+                </t-card>
+            </t-tab-panel>
+
+            <t-tab-panel value="expenses" label="记账">
+                <t-card title="添加账单" class="expense-card">
+                    <t-form id="expenseForm" label-width="120px">
+                        <t-row :gutter="20">
+                            <t-col :span="12">
+                                <t-form-item label="消费描述">
+                                    <t-input 
+                                        id="expenseDesc" 
+                                        placeholder="例如：酒店住宿"
+                                        clearable
+                                    />
+                                </t-form-item>
+                            </t-col>
+                            <t-col :span="12">
+                                <t-form-item label="金额">
+                                    <t-input-number 
+                                        id="expenseAmount" 
+                                        placeholder="输入金额"
+                                        :decimal-places="2"
+                                        :min="0"
+                                    />
+                                </t-form-item>
+                            </t-col>
+                        </t-row>
+                        
+                        <t-row :gutter="20">
+                            <t-col :span="12">
+                                <t-form-item label="支付人">
+                                    <t-select 
+                                        id="expensePayer" 
+                                        placeholder="选择支付人"
+                                        clearable
+                                    >
+                                        <t-option value="" label="选择支付人" disabled />
+                                    </t-select>
+                                </t-form-item>
+                            </t-col>
+                            <t-col :span="12">
+                                <t-form-item label="消费分类">
+                                    <t-select id="expenseCategory" v-model="category">
+                                        <t-option value="交通" label="🚗 交通" />
+                                        <t-option value="住宿" label="🏨 住宿" />
+                                        <t-option value="餐饮" label="🍽️ 餐饮" />
+                                        <t-option value="购物" label="🛍️ 购物" />
+                                        <t-option value="门票" label="🎫 门票" />
+                                        <t-option value="娱乐" label="🎮 娱乐" />
+                                        <t-option value="其他" label="📦 其他" />
+                                    </t-select>
+                                </t-form-item>
+                            </t-col>
+                        </t-row>
+                        
+                        <t-form-item label="货币类型">
+                            <t-radio-group id="currencyGroup" variant="default-filled">
+                                <t-radio value="CNY">CNY (¥)</t-radio>
+                                <t-radio value="USD">USD ($)</t-radio>
+                                <t-radio value="EUR">EUR (€)</t-radio>
+                                <t-radio value="JPY">JPY (¥)</t-radio>
+                                <t-radio value="KRW">KRW (₩)</t-radio>
+                                <t-radio value="THB">THB (฿)</t-radio>
+                            </t-radio-group>
+                        </t-form-item>
+                        
+                        <t-form-item label="当前汇率">
+                            <t-input-number 
+                                id="exchangeRate" 
+                                :value="1"
+                                :decimal-places="4"
+                                :min="0"
+                                placeholder="输入汇率"
+                            />
+                            <span class="rate-hint">1 外币 = ? 人民币</span>
+                        </t-form-item>
+                        
+                        <t-form-item label="分账模式">
+                            <t-radio-group id="splitModeGroup" variant="default-filled">
+                                <t-radio value="equal">均摊</t-radio>
+                                <t-radio value="proportional">按比例</t-radio>
+                                <t-radio value="custom">指定人</t-radio>
+                            </t-radio-group>
+                        </t-form-item>
+                        
+                        <t-form-item label="参与成员">
+                            <t-checkbox-group id="expenseMembers">
+                                <t-empty description="请先添加成员" />
+                            </t-checkbox-group>
+                        </t-form-item>
+                        
+                        <t-form-item label="比例分配" id="proportionalInputs" style="display: none;">
+                            <div id="proportionalList" class="proportional-list"></div>
+                        </t-form-item>
+                        
+                        <t-form-item>
+                            <t-button theme="primary" size="large" onclick="addExpense()" block>
+                                <template #icon><i class="fas fa-plus"></i></template>
+                                添加账单
+                            </t-button>
+                        </t-form-item>
+                    </t-form>
+                </t-card>
+
+                <!-- 账单列表 -->
+                <t-card title="账单列表">
+                    <div id="expenseList" class="expense-list">
+                        <t-empty description="暂无账单">
+                            <template #image><i class="fas fa-inbox"></i></template>
+                        </t-empty>
+                    </div>
+                </t-card>
+            </t-tab-panel>
+
+            <t-tab-panel value="settlement" label="结算">
+                <!-- 总览卡片 -->
+                <t-card class="summary-card">
+                    <t-row :gutter="20">
+                        <t-col :span="8">
+                            <t-statistic title="总消费" :value="totalAmount" suffix="元" />
+                        </t-col>
+                        <t-col :span="8">
+                            <t-statistic title="账单数" :value="totalExpenses" />
+                        </t-col>
+                        <t-col :span="8">
+                            <t-statistic title="人均消费" :value="perPersonAmount" suffix="元" />
+                        </t-col>
+                    </t-row>
+                </t-card>
+
+                <!-- 分类统计 -->
+                <t-card title="分类统计" class="stats-card">
+                    <t-row :gutter="16">
+                        <t-col :span="6">
+                            <div class="stat-item">
+                                <i class="fas fa-car stat-icon"></i>
+                                <div class="stat-content">
+                                    <div class="stat-label">交通</div>
+                                    <div class="stat-value" id="statTransport">¥0.00</div>
+                                </div>
+                            </div>
+                        </t-col>
+                        <t-col :span="6">
+                            <div class="stat-item">
+                                <i class="fas fa-hotel stat-icon"></i>
+                                <div class="stat-content">
+                                    <div class="stat-label">住宿</div>
+                                    <div class="stat-value" id="statAccommodation">¥0.00</div>
+                                </div>
+                            </div>
+                        </t-col>
+                        <t-col :span="6">
+                            <div class="stat-item">
+                                <i class="fas fa-utensils stat-icon"></i>
+                                <div class="stat-content">
+                                    <div class="stat-label">餐饮</div>
+                                    <div class="stat-value" id="statFood">¥0.00</div>
+                                </div>
+                            </div>
+                        </t-col>
+                        <t-col :span="6">
+                            <div class="stat-item">
+                                <i class="fas fa-shopping-bag stat-icon"></i>
+                                <div class="stat-content">
+                                    <div class="stat-label">购物</div>
+                                    <div class="stat-value" id="statShopping">¥0.00</div>
+                                </div>
+                            </div>
+                        </t-col>
+                    </t-row>
+                </t-card>
+
+                <!-- 债务网络 -->
+                <t-card title="债务网络">
+                    <div id="debtNetwork" class="debt-network">
+                        <t-empty description="所有成员都已结清">
+                            <template #image><i class="fas fa-check-circle"></i></template>
+                        </t-empty>
+                    </div>
+                </t-card>
+            </t-tab-panel>
+
+            <t-tab-panel value="export" label="导出">
+                <t-card title="导出和分享">
+                    <t-row :gutter="20">
+                        <t-col :span="8">
+                            <div class="export-option" onclick="exportPDF()">
+                                <i class="fas fa-file-pdf export-icon"></i>
+                                <h4>导出 PDF</h4>
+                                <p>生成专业的结算报告</p>
+                            </div>
+                        </t-col>
+                        <t-col :span="8">
+                            <div class="export-option" onclick="exportImage()">
+                                <i class="fas fa-image export-icon"></i>
+                                <h4>导出图片</h4>
+                                <p>生成图片便于分享</p>
+                            </div>
+                        </t-col>
+                        <t-col :span="8">
+                            <div class="export-option" onclick="showShareModal()">
+                                <i class="fas fa-link export-icon"></i>
+                                <h4>分享链接</h4>
+                                <p>生成邀请链接</p>
+                            </div>
+                        </t-col>
+                    </t-row>
+
+                    <!-- 预览区域 -->
+                    <div id="exportPreview" class="preview-container" style="display: none;">
+                        <h3><i class="fas fa-eye"></i> 预览</h3>
+                        <div id="previewContent" class="preview-content"></div>
+                    </div>
+                </t-card>
+            </t-tab-panel>
+        </t-tabs>
+    </div>
+
+    <!-- 分享对话框 -->
+    <t-dialog
+        id="shareDialog"
+        header="分享旅行"
+        width="500px"
+        :visible="false"
+        :confirm-btn="null"
+        @close="closeShareModal"
+    >
+        <t-form label-width="80px">
+            <t-form-item label="分享链接">
+                <t-input id="shareLink" readonly>
+                    <template #suffix>
+                        <t-button variant="text" onclick="copyLink()">
+                            <i class="fas fa-copy"></i>
+                        </t-button>
+                    </template>
+                </t-input>
+            </t-form-item>
+        </t-form>
+        
+        <div class="share-buttons">
+            <t-button theme="success" block onclick="shareWeChat()">
+                <template #icon><i class="fab fa-weixin"></i></template>
+                微信分享
+            </t-button>
+            <t-button theme="primary" block onclick="shareEmail()">
+                <template #icon><i class="fas fa-envelope"></i></template>
+                邮件分享
+            </t-button>
+            <t-button theme="default" block onclick="copyLink()">
+                <template #icon><i class="fas fa-copy"></i></template>
+                复制链接
+            </t-button>
+        </div>
+    </t-dialog>
+
+    <!-- 消息提示 -->
+    <t-message id="message" />
+
+    <!-- 加载 TDesign 组件库 -->
+    <script src="https://cdn.jsdelivr.net/npm/tdesign@1.9.0/dist/tdesign.min.js"></script>
+    
+    <!-- 加载自定义 JavaScript -->
+    <script src="travel-expense-tracker.js"></script>
+</body>
+</html>

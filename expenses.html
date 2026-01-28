@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>记账 - 旅行记账AA</title>
+    
+    <!-- 自定义 CSS -->
+    <link href="travel-expense-tracker.css?v=1.2" rel="stylesheet">
+    
+    <!-- 图标库 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Socket.IO 客户端 -->
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <!-- 头部导航 -->
+    <header class="page-header">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="header-content">
+                <button class="back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i> 返回
+                </button>
+                <h1>
+                    <i class="fas fa-receipt"></i> 记账
+                </h1>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-success" onclick="openModal()">
+                    <i class="fas fa-plus"></i> 添加账单
+                </button>
+            </div>
+        </div>
+        <div class="container" style="text-align: center; padding-top: 0;">
+            <p id="travelInfoDisplay" style="opacity: 0.9;"></p>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- 统计卡片 -->
+        <div class="card">
+            <h2><i class="fas fa-chart-line"></i> 消费统计</h2>
+            <div class="row">
+                <div class="col">
+                    <div class="quick-stat">
+                        <div class="stat-label">总消费</div>
+                        <div class="stat-value" id="totalAmount">¥0.00</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="quick-stat">
+                        <div class="stat-label">账单数</div>
+                        <div class="stat-value" id="expenseCount">0</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="quick-stat">
+                        <div class="stat-label">人均</div>
+                        <div class="stat-value" id="perPersonAmount">¥0.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分类统计 -->
+        <div class="card">
+            <h2><i class="fas fa-tags"></i> 分类统计</h2>
+            <div class="row">
+                <div class="col">
+                    <div class="category-item">
+                        <i class="fas fa-car category-icon"></i>
+                        <div class="category-info">
+                            <div class="category-name">交通</div>
+                            <div class="category-amount" id="statTransport">¥0.00</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="category-item">
+                        <i class="fas fa-hotel category-icon"></i>
+                        <div class="category-info">
+                            <div class="category-name">住宿</div>
+                            <div class="category-amount" id="statAccommodation">¥0.00</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="category-item">
+                        <i class="fas fa-utensils category-icon"></i>
+                        <div class="category-info">
+                            <div class="category-name">餐饮</div>
+                            <div class="category-amount" id="statFood">¥0.00</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="category-item">
+                        <i class="fas fa-shopping-bag category-icon"></i>
+                        <div class="category-info">
+                            <div class="category-name">购物</div>
+                            <div class="category-amount" id="statShopping">¥0.00</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="category-item">
+                        <i class="fas fa-ellipsis-h category-icon"></i>
+                        <div class="category-info">
+                            <div class="category-name">其他</div>
+                            <div class="category-amount" id="statOther">¥0.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 账单列表 -->
+        <div class="card">
+            <h2><i class="fas fa-list"></i> 账单明细</h2>
+            <div id="expenseList" class="expense-list">
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <h3>暂无账单</h3>
+                    <p>点击右上角"添加账单"开始记账</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加账单模态框 -->
+    <div class="modal" id="addExpenseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus-circle"></i> 添加账单</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>消费描述</label>
+                    <input type="text" id="expenseDescription" class="form-control" placeholder="例如：酒店住宿">
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>金额</label>
+                            <input type="number" id="expenseAmount" class="form-control" placeholder="输入金额" step="0.01" min="0">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label>支付人</label>
+                            <select id="expensePayer" class="form-control">
+                                <option value="">选择支付人</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>消费分类</label>
+                    <select id="expenseCategory" class="form-control">
+                        <option value="交通">🚗 交通</option>
+                        <option value="住宿">🏨 住宿</option>
+                        <option value="餐饮">🍽️ 餐饮</option>
+                        <option value="购物">🛍️ 购物</option>
+                        <option value="门票">🎫 门票</option>
+                        <option value="娱乐">🎮 娱乐</option>
+                        <option value="其他">📦 其他</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>货币类型</label>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <label class="currency-option"><input type="radio" name="currency" value="CNY" checked class="currency-option"> CNY (¥)</label>
+                        <label class="currency-option"><input type="radio" name="currency" value="USD" class="currency-option"> USD ($)</label>
+                        <label class="currency-option"><input type="radio" name="currency" value="EUR" class="currency-option"> EUR (€)</label>
+                        <label class="currency-option"><input type="radio" name="currency" value="JPY" class="currency-option"> JPY (¥)</label>
+                        <label class="currency-option"><input type="radio" name="currency" value="KRW" class="currency-option"> KRW (₩)</label>
+                        <label class="currency-option"><input type="radio" name="currency" value="THB" class="currency-option"> THB (฿)</label>
+                    </div>
+                </div>
+
+                <div class="form-group" id="customRateContainer" style="display: none;">
+                    <label>自定义汇率（1 外币 = ? 人民币）</label>
+                    <input type="number" id="customRate" class="form-control" placeholder="输入汇率" step="0.0001" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label>分账模式</label>
+                    <div style="display: flex; gap: 15px;">
+                        <label class="split-option"><input type="radio" name="splitMode" value="equal" checked class="split-option"> 均摊</label>
+                        <label class="split-option"><input type="radio" name="splitMode" value="ratio" class="split-option"> 按比例</label>
+                        <label class="split-option"><input type="radio" name="splitMode" value="specific" class="split-option"> 指定人</label>
+                    </div>
+                </div>
+
+                <div class="form-group" id="customSplitSection" style="display: none;">
+                    <label>比例分配</label>
+                    <p style="color: #999; font-size: 0.9rem;">按比例模式下，将平均分配给选中的成员</p>
+                </div>
+
+                <div class="form-group">
+                    <label>参与成员</label>
+                    <div id="memberSelectList" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <p style="color: #999;">请先添加成员</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                <button class="btn btn-primary" onclick="addExpense()">
+                    <i class="fas fa-check"></i> 添加
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载页面逻辑 -->
+    <script src="cloud-api.js"></script>
+    <script src="expenses.js"></script>
+</body>
+</html>
